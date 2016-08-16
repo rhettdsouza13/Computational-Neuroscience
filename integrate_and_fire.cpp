@@ -1,4 +1,5 @@
 #include<iostream>
+#include<fstream>
 using namespace std;
 
 class Neuron{
@@ -15,21 +16,49 @@ class Neuron{
         this->Ek = Ek;
         this->Espike = Espike;
       }
-
+      float calculateSlope(float V){
+          float slope;
+          slope = ((this->I + (this->gleak*this->Eleak))/this->gleak)-V;
+          return slope;
+      }
       float runNeuron(){
 
+        float Vo,to,m,V1,t1;
+        Vo = Eleak;
+        to = 0;
+        fstream afile;
+        afile.open("VxT.txt", ios::out | ios::in );
+        for(int i =0; i<=200; i++){
+          m = calculateSlope(Vo);
 
+          V1 = Vo + m*0.01;
+          t1 = to + 0.01;
 
-        return Espike;
+          if (V1>=this->Ethresh){
+            V1 = this->Espike;
+            cout << "Voltage = " << V1 << " Time = " << t1 << endl;
+            afile << V1 << " " << t1 << endl;
+            Vo = this->Ek;
+            to = t1;
+
+            continue;
+          }
+          cout << "Voltage = " << V1 << " Time = " << t1 << endl;
+          afile << V1 << " " << t1 << endl;
+          Vo = V1;
+          to = t1;
+
+        }
+
       }
 
 };
 
 int main()
 {
-  Neuron singleNeuron(0.1,0.1,0.1,0.1,0.2,0.3,0.4);
+  Neuron singleNeuron(0.1,0.3,0.1,0.3,0.5,0.1,1);
 
-  cout << singleNeuron.runNeuron();
+  singleNeuron.runNeuron();
 
   return 0;
 }
