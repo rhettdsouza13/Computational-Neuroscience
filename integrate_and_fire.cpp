@@ -41,12 +41,13 @@ int main()
   std::vector<Neuron> setNeuron;
 
   setNeuron.push_back(Neuron(0.1,0.3,0.2,0.3,0.6,0.1,1));
-  setNeuron.push_back(Neuron(0.1,0,0.2,0.3,0.6,0.1,1));
-  setNeuron.push_back(Neuron(0.1,0,0.2,0.3,0.6,0.1,1));
+  setNeuron.push_back(Neuron(0.1,0.3,0.2,0.3,0.6,0.1,1));
+  setNeuron.push_back(Neuron(0.1,1,0.2,0.3,0.6,0.1,1));
 
-  VectCond[0][2]=0;
-	VectCond[1][0]=10;
-	VectCond[2][1]=10;
+  VectCond[0][2]=20;
+  VectCond[0][1]=20;
+	VectCond[1][0]=0;
+	VectCond[2][1]=0;
 
   /*for (int i=0; i<3; i++){
     for (int j=0; j<3; i++)
