@@ -18,6 +18,7 @@ x2data = []
 y2data = []
 x3data = []
 y3data = []
+
 for j in xrange(len(first)):
     y1data.append(first[j][0])
     x1data.append(first[j][1])
