@@ -2,8 +2,11 @@
 #include<fstream>
 #include<vector>
 using namespace std;
-std::vector<std::vector<float> > VectCond(3, std::vector<float>(3,0));
-float voltages[3] = {0.3,0.3,0.3};
+
+const int N = 20;
+float VectCond[N][N];
+float voltages[N];
+
 class Neuron{
 
   public:
@@ -18,15 +21,16 @@ class Neuron{
         this->Ek = Ek;
         this->Espike = Espike;
       }
+
       float calculateSlope(float V, int neuronNum){
           float slope,constant;
           constant = (this->I + (this->gleak*this->Eleak))/this->C;
-          for (int i=0; i<3; i++){
+          for (int i=0; i<N; i++){
             constant += (VectCond[neuronNum][i]*voltages[i])/this->C;
 
           }
           slope = constant;
-          for (int i=0; i<3; i++){
+          for (int i=0; i<N; i++){
             slope -= (VectCond[neuronNum][i]/this->C)*V;
           }
           return slope;
@@ -38,61 +42,100 @@ class Neuron{
 
 int main()
 {
+
+
   std::vector<Neuron> setNeuron;
 
-  setNeuron.push_back(Neuron(0.1,0.3,0.2,0.3,0.6,0.1,1));
-  setNeuron.push_back(Neuron(0.1,0.3,0.2,0.3,0.6,0.1,1));
-  setNeuron.push_back(Neuron(0.1,1,0.2,0.3,0.6,0.1,1));
+  int toCheck[3];
+  toCheck[0]=0;
+  toCheck[1]=1;
+  toCheck[2]=3;
 
-  VectCond[0][2]=20;
-  VectCond[0][1]=20;
-	VectCond[1][0]=0;
-	VectCond[2][1]=0;
+  float Vo[N],to[N],m[N],V1[N],t1[N];
 
-  /*for (int i=0; i<3; i++){
-    for (int j=0; j<3; i++)
-    {
-      cout << VectCond[i][j];
+  for (int i = 0; i<N; i++){
+    setNeuron.push_back(Neuron(0.1,0,0.2,0.3,0.6,0.1,1));
+    Vo[i] = setNeuron[i].Eleak;
+    to[i] = 0;
+    voltages[i]=setNeuron[i].Eleak;
+  }
+
+
+  setNeuron[0].I = 1;
+
+
+  for (int i=0; i<N; i++){
+    for (int j=0; j<N; j++){
+      VectCond[i][j]=0;
     }
-    cout << endl;
+  }
+  for (int num=1; num<N; num++){
+  VectCond[num][num-1]=10;
+  VectCond[num-1][num]=10;
+}
+//  VectCond[19][0] = 100;
+
+  /*for (int i=1; i<N; i++){
+
+    VectCond[i][j]==1000;
   }*/
 
-
-  float Vo[3],to[3],m[3],V1[3],t1[3];
-  Vo[0] = setNeuron[0].Eleak;
-  Vo[1] = setNeuron[1].Eleak;
-  Vo[2] = setNeuron[2].Eleak;
-
-  to[0] = 0;
-  to[1] = 0;
-  to[2] = 0;
   fstream afile;
   afile.open("VxT.txt", ios::out | ios::in );
-  for(int j =0; j<=200; j++){
-    m[0] = setNeuron[0].calculateSlope(Vo[0],0);
-    m[1] = setNeuron[1].calculateSlope(Vo[1],1);
-    m[2] = setNeuron[2].calculateSlope(Vo[2],2);
-    for(int i=0; i<3; i++){
-    V1[i] = Vo[i] + m[i]*0.005;
-    t1[i] = to[i] + 0.005;
 
-    if (V1[i]>=setNeuron[i].Ethresh){
-      V1[i] = setNeuron[i].Espike;
-      cout << "Voltage = " << i << " "<< V1[i] << " Time = " << t1[i] << endl;
-      afile << V1[i] << " " << t1[i] << endl;
-      Vo[i] = setNeuron[i].Ek;
-      to[i] = t1[i];
-      voltages[i]=Vo[i];
+//run system
 
+  for(int j=0; j<5000; j++){
+    //calculateSlope for all neurons
+    for (int i =0; i<N; i++){
+      m[i] = setNeuron[i].calculateSlope(Vo[i],i);
     }
-    else{
-    cout << "Voltage = " << i << " " <<  V1[i] << " Time = " << t1[i] << endl;
-    afile << V1[i] << " " << t1[i] << endl;
-    Vo[i] = V1[i];
-    to[i] = t1[i];
-    voltages[i]=Vo[i];
-    }
-    }
+
+    for(int i=0; i<N; i++){
+
+      //stepping voltage and time
+      V1[i] = Vo[i] + m[i]*0.0001;
+      t1[i] = to[i] + 0.0001;
+
+      //checking for threshold voltage
+
+      if (V1[i]>=setNeuron[i].Ethresh){
+        V1[i] = setNeuron[i].Espike;
+
+        for (int k = 0; k<N; k++){
+          if (VectCond[k][i]){
+            Vo[k]+=0.1;
+            //voltages[k]+=1;
+          }
+        }
+
+
+        //printing ONLY for the chosen neuronal numbers
+        if (i==toCheck[0] || i==toCheck[1] || i==toCheck[2]){
+          cout << "Voltage = " << i << " "<< V1[i] << " Time = " << t1[i] << endl;
+          afile << V1[i] << " " << t1[i] << endl;
+        }
+
+        //reset neuron to Ek(reset Voltage)
+
+
+        Vo[i] = setNeuron[i].Ek;
+        to[i] = t1[i];
+        voltages[i]=Vo[i];
+
+      }
+        //no spiking, keep going
+
+      else{
+          if (i==toCheck[0] || i==toCheck[1] || i==toCheck[2]){
+          cout << "Voltage = " << i << " " <<  V1[i] << " Time = " << t1[i] << endl;
+          afile << V1[i] << " " << t1[i] << endl;
+        }
+        Vo[i] = V1[i];
+        to[i] = t1[i];
+        voltages[i]=Vo[i];
+      }
+      }
   }
 
 
