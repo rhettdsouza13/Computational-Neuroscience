@@ -43,13 +43,16 @@ class Neuron{
 int main()
 {
 
+  fstream network;
+  network.open("net.txt", ios::out | ios::in );
+  network << N << endl;
 
   std::vector<Neuron> setNeuron;
 
   int toCheck[3];
   toCheck[0]=0;
   toCheck[1]=1;
-  toCheck[2]=3;
+  toCheck[2]=5;
 
   float Vo[N],to[N],m[N],V1[N],t1[N];
 
@@ -61,7 +64,7 @@ int main()
   }
 
 
-  setNeuron[0].I = 1;
+  setNeuron[0].I = 0.5;
 
 
   for (int i=0; i<N; i++){
@@ -72,7 +75,8 @@ int main()
   for (int num=1; num<N; num++){
   VectCond[num][num-1]=10;
   VectCond[num-1][num]=10;
-}
+  network << num << " " << num-1 << endl;
+  }
 //  VectCond[19][0] = 100;
 
   /*for (int i=1; i<N; i++){
@@ -80,12 +84,12 @@ int main()
     VectCond[i][j]==1000;
   }*/
 
-  fstream afile;
-  afile.open("VxT.txt", ios::out | ios::in );
+    fstream afile;
+    afile.open("VxT.txt", ios::out | ios::in );
 
 //run system
 
-  for(int j=0; j<5000; j++){
+  for(int j=0; j<10000; j++){
     //calculateSlope for all neurons
     for (int i =0; i<N; i++){
       m[i] = setNeuron[i].calculateSlope(Vo[i],i);
@@ -104,7 +108,7 @@ int main()
 
         for (int k = 0; k<N; k++){
           if (VectCond[k][i]){
-            Vo[k]+=0.1;
+            Vo[k]+=0.07;
             //voltages[k]+=1;
           }
         }
@@ -112,7 +116,7 @@ int main()
 
         //printing ONLY for the chosen neuronal numbers
         if (i==toCheck[0] || i==toCheck[1] || i==toCheck[2]){
-          cout << "Voltage = " << i << " "<< V1[i] << " Time = " << t1[i] << endl;
+          //cout << "Voltage = " << i << " "<< V1[i] << " Time = " << t1[i] << endl;
           afile << V1[i] << " " << t1[i] << endl;
         }
 
@@ -128,7 +132,7 @@ int main()
 
       else{
           if (i==toCheck[0] || i==toCheck[1] || i==toCheck[2]){
-          cout << "Voltage = " << i << " " <<  V1[i] << " Time = " << t1[i] << endl;
+          //cout << "Voltage = " << i << " " <<  V1[i] << " Time = " << t1[i] << endl;
           afile << V1[i] << " " << t1[i] << endl;
         }
         Vo[i] = V1[i];
