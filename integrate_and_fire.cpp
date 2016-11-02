@@ -1,6 +1,10 @@
 #include<iostream>
 #include<fstream>
 #include<vector>
+#include<time.h>
+#include<stdlib.h>
+
+
 using namespace std;
 
 const int N = 20;
@@ -72,10 +76,15 @@ int main()
       VectCond[i][j]=0;
     }
   }
-  for (int num=1; num<N; num++){
-  VectCond[num][num-1]=10;
-  VectCond[num-1][num]=10;
-  network << num << " " << num-1 << endl;
+  srand(time(NULL));
+  for (int i=0; i<N; i++){
+    for (int j=i+1; j<N; j++){
+      if (rand()%10>5){
+        VectCond[i][j]=10;
+        VectCond[j][i]=10;
+        network << i << " " << j << endl;
+        }
+    }
   }
 //  VectCond[19][0] = 100;
 

@@ -1,11 +1,16 @@
 #include<iostream>
+#include<stdlib.h>
+#include<time.h>
 using namespace std;
 int main(int argc, char const *argv[]) {
 
   /* code */
-  int n=10;
-  int a[n];
-  a[7]=9;
-  cout<< a[7];
-  return 0;
+  srand(time(NULL));
+  for (int i =0; i<10; i++)
+  {
+    cout<< rand()%10 << endl;
+
+
+  }
+
 }
