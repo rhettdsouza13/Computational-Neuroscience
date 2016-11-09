@@ -53,11 +53,7 @@ int main()
 
   std::vector<Neuron> setNeuron;
 
-  int toCheck[3];
-  toCheck[0]=0;
-  toCheck[1]=1;
-  toCheck[2]=5;
-
+  
   float Vo[N],to[N],m[N],V1[N],t1[N];
 
   for (int i = 0; i<N; i++){

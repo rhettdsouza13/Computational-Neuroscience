@@ -2,7 +2,7 @@ import igraph as ig
 import plotly.plotly as py
 from plotly.graph_objs import *
 
-with open("net.txt", "rb") as graphfile:
+with open("network.txt", "rb") as graphfile:
     graphstructure =  graphfile.readlines()
 
 N = int(graphstructure[0])
