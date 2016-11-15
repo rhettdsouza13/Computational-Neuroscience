@@ -50,14 +50,22 @@ double weightUpdate(double t1, double t2, float currentWeight){
 
 int main(){
   int toCheck[3];
-  toCheck[0]=0;
-  toCheck[1]=1;
-  toCheck[2]=4;
+  int wCheckPre, wCheckPost;
+  cout<<"Enter Checks-> ";
+  cin>>toCheck[0];
+  cin>>toCheck[1];
+  cin>>toCheck[2];
+
+  cout<<"Which Synapse to check? -> ";
+  cin>>wCheckPre;
+  cin>>wCheckPost;
 
   std::vector<Neuron> setNeuron;
 
   std::vector<float> Vo,V1,to,t1,m;
 
+  fstream weightfile;
+  weightfile.open("weightdist.txt", ios::out | ios::in);
 
 
   fstream networkfile;
@@ -78,8 +86,8 @@ int main(){
     Vo.push_back(setNeuron[i].Eleak);
   }
 
-  setNeuron[0].I = 0.5;
-  setNeuron[2].I = 0.25;
+  setNeuron[0].I = 1;
+  //setNeuron[2].I = 0.25;
   //setNeuron[1].I = 0.001;
 
   std::vector< std::vector<float> > VectCond;
@@ -92,7 +100,10 @@ int main(){
     VectCond.push_back(row);
   }
 
-  for(int a,b,c; networkfile >> a >> b >> c; ){
+  int a,b;
+  float c;
+
+  for(a,b,c; networkfile >> a >> b >> c; ){
     VectCond[a][b]=c;
   }
 
@@ -124,6 +135,8 @@ int main(){
 
 //run system
 
+float timer=0;
+
 for(int j=0; j<100000; j++){
   //calculateSlope for all neurons
   for (int i =0; i<numOfNodes; i++){
@@ -133,9 +146,12 @@ for(int j=0; j<100000; j++){
   for(int i=0; i<numOfNodes; i++){
 
     //stepping voltage and time
-    V1[i] = Vo[i] + m[i]*0.0001;
-    t1[i] = to[i] + 0.0001;
-
+    V1[i] = Vo[i] + m[i]*0.001;
+    t1[i] = to[i] + 0.001;
+    timer+=0.001;
+    if (timer>80 && timer<80.100){
+      setNeuron[2].I=1.5;
+    }
     //checking for threshold voltage
 
     if (V1[i]>=setNeuron[i].Ethresh){
@@ -195,7 +211,7 @@ for(int j=0; j<100000; j++){
           //   }
 
 
-          VectCond[pre][post]+=weightUpdate(SpikeTimes[pre][post][1][postcount], SpikeTimes[pre][post][0][precount], VectCond[pre][post]);
+          VectCond[pre][post]+=weightUpdate(SpikeTimes[pre][post][0][precount], SpikeTimes[pre][post][1][postcount], VectCond[pre][post]);
 
           SpikeTimes[pre][post][1].erase(SpikeTimes[pre][post][1].begin());
           SpikeTimes[pre][post][0].erase(SpikeTimes[pre][post][0].begin());
@@ -212,6 +228,9 @@ for(int j=0; j<100000; j++){
     }
   }
 }
+
+  weightfile << VectCond[wCheckPre][wCheckPost] << " " << timer << endl;
+
 }
   // for(int i=0; i<numOfNodes; i++){
   //   for(int j=0; j<numOfNodes; j++){
@@ -225,6 +244,8 @@ for(int j=0; j<100000; j++){
   // outNet.open("newNetwork.txt", ios::out | ios::in);
 
 //  networkfile << numOfNodes << endl;
+cout << endl;
+cout << endl;
   for(int i =0; i<numOfNodes; i++){
     for (int j=0; j<numOfNodes; j++){
       cout<< i << " " << j << " " << VectCond[i][j] << endl;
@@ -232,6 +253,9 @@ for(int j=0; j<100000; j++){
     }
   }
 
+  weightfile.close();
+  networkfile.close();
+  afile.close();
 
   return 0;
 }
