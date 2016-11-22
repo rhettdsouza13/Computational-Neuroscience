@@ -1,3 +1,6 @@
+truncate -s 0 VxT.txt
+truncate -s 0 weightdist.txt
+
 g++ RunNetwork.cpp -o fire_away
 
 ./fire_away

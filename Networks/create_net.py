@@ -9,7 +9,7 @@ outFile.write(str(numOfNodes) + "\n")
 for i in xrange(numOfNodes):
     for j in xrange(numOfNodes):
         if random.randrange(0,100) > 75:
-            if net[j][i]==0:
+            if net[j][i]==0 and i!=j:
                 toWrite = str(i) + " " + str(j) + " " + str(random.uniform(0,50)) + "\n"
                 net[i][j]=1
                 outFile.write(toWrite)

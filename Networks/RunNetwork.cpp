@@ -6,7 +6,7 @@
 #include<math.h>
 
 using namespace std;
-#define ITERS 10000
+#define ITERS 100000
 
 
 class Neuron{
@@ -192,7 +192,7 @@ for(int j=0; j<ITERS; j++){
   for (int i =0; i<numOfNodes; i++){
     m[i] = setNeuron[i].calculateSlope(Vo[i]);
   }
-
+  afile << 0 << " " << V1[0] << " " << t1[0] << endl;
   for(int i=0; i<numOfNodes; i++){
 
     //stepping voltage and time
@@ -224,6 +224,7 @@ for(int j=0; j<ITERS; j++){
 
         if (toCheck[step-1][i]){
         //cout << "Voltage = " << i << " " <<  V1[i] << " Time = " << t1[i] << endl;
+
         afile << i << " " << V1[i] << " " << t1[i] << endl;
       }
 
@@ -239,7 +240,6 @@ for(int j=0; j<ITERS; j++){
       //no spiking, keep going
 
     else{
-
         if (toCheck[step-1][i]){
         afile << i << " " << V1[i] << " " << t1[i] << endl;
       }
@@ -271,8 +271,8 @@ for(int j=0; j<ITERS; j++){
           if (VectCond[pre][post]<=0){
             VectCond[pre][post]=0;
           }
-          if(VectCond[pre][post]>50){
-            VectCond[pre][post]=50;
+          if(VectCond[pre][post]>100){
+            VectCond[pre][post]=100;
           }
         }
       }
@@ -283,13 +283,13 @@ for(int j=0; j<ITERS; j++){
 for(int k=0; k<numOfNodes; k++){
   if (toCheck[step-1][k]){
     if (step==1 && VectCondCopy[0][k]){
-      weightfile << 0 << " " <<  k << " " << VectCond[0][k]<<endl;
+      weightfile << 0 << " " <<  k << " " << VectCond[0][k]<<" "<< timer<< endl;
       continue;
     }
     for (int l=0; l<numOfNodes; l++){
 
       if(VectCondCopy[l][k] && toCheck[step-2][l]){
-        weightfile << l << " " <<  k << " " << VectCond[l][k]<<endl;
+        weightfile << l << " " <<  k << " " << VectCond[l][k]<<" "<< timer <<endl;
         }
       }
     }
