@@ -6,7 +6,7 @@
 #include<math.h>
 
 using namespace std;
-
+#define ITERS 10000
 
 
 class Neuron{
@@ -49,19 +49,13 @@ double weightUpdate(double t1, double t2, float currentWeight){
 }
 
 int main(){
-  int toCheck[3];
-  int wCheckPre, wCheckPost;
-  cout<<"Enter Checks-> ";
-  cin>>toCheck[0];
-  cin>>toCheck[1];
-  cin>>toCheck[2];
 
-  cout<<"Which Synapse to check? -> ";
-  cin>>wCheckPre;
-  cin>>wCheckPost;
+  int step = 0;
+  cout<<"Enter Step -> ";
+  cin>>step;
+  cout<<endl;
 
   std::vector<Neuron> setNeuron;
-
   std::vector<float> Vo,V1,to,t1,m;
 
   fstream weightfile;
@@ -76,6 +70,11 @@ int main(){
 
   networkfile >> numOfNodes;
   cout<<numOfNodes<<endl;
+
+
+
+
+
 
   for (int i=0; i<numOfNodes; i++){
     V1.push_back(0);
@@ -107,6 +106,9 @@ int main(){
     VectCond[a][b]=c;
   }
 
+  std::vector< std::vector<float> > VectCondCopy = VectCond;
+
+
   for (int i = 0; i<numOfNodes; i++){
     for (int j=0; j<numOfNodes; j++){
       cout<<i<<" "<<j<<" "<<VectCond[i][j]<<endl;
@@ -130,14 +132,62 @@ int main(){
       SpikeTimes.push_back(row);
     }
 
+    std::vector< std::vector<int> > toCheck;
+
+    for(int i=0; i<step; i++){
+        std::vector<int> row;
+        for (int j=0; j<numOfNodes; j++)
+        {
+          row.push_back(0);
+        }
+        toCheck.push_back(row);
+      }
+
+    for(int i=0; i<numOfNodes; i++){
+        if (VectCond[0][i]){
+          toCheck[0][i]=1;
+        }
+    }
+    int flag=1;
+    for(int stepper=1; stepper<step; stepper++){
+        for (int i=0; i<numOfNodes; i++){
+          for(int j=0; j<numOfNodes; j++){
+            if (VectCond[i][j] && toCheck[stepper-1][i]){
+              flag=1;
+              for(int k=0; k<stepper; k++)
+              {
+                if(toCheck[k][j]){
+                  flag=0;
+                  break;
+                }
+
+              }
+              if (flag){
+                toCheck[stepper][j]=1;
+              }
+            }
+          }
+        }
+      }
+    cout<<endl;
+    for (int i=0; i<step; i++){
+      for(int j=0; j<numOfNodes; j++){
+        cout<<i<<" "<<j<<" "<<toCheck[i][j]<<endl;
+      }
+    }
+
+
+
+
+
   fstream afile;
   afile.open("VxT.txt", ios::out | ios::in );
 
 //run system
-
+  afile << ITERS << endl;
 float timer=0;
 
-for(int j=0; j<100000; j++){
+for(int j=0; j<ITERS; j++){
   //calculateSlope for all neurons
   for (int i =0; i<numOfNodes; i++){
     m[i] = setNeuron[i].calculateSlope(Vo[i]);
@@ -149,9 +199,7 @@ for(int j=0; j<100000; j++){
     V1[i] = Vo[i] + m[i]*0.001;
     t1[i] = to[i] + 0.001;
     timer+=0.001;
-    if (timer>80 && timer<80.100){
-      setNeuron[2].I=1.5;
-    }
+
     //checking for threshold voltage
 
     if (V1[i]>=setNeuron[i].Ethresh){
@@ -173,10 +221,12 @@ for(int j=0; j<100000; j++){
 
 
       //printing ONLY for the chosen neuronal numbers
-      if (i==toCheck[0] || i==toCheck[1] || i==toCheck[2]){
-        //cout << "Voltage = " << i << " "<< V1[i] << " Time = " << t1[i] << endl;
-        afile << V1[i] << " " << t1[i] << endl;
+
+        if (toCheck[step-1][i]){
+        //cout << "Voltage = " << i << " " <<  V1[i] << " Time = " << t1[i] << endl;
+        afile << i << " " << V1[i] << " " << t1[i] << endl;
       }
+
 
       //reset neuron to Ek(reset Voltage)
 
@@ -189,10 +239,11 @@ for(int j=0; j<100000; j++){
       //no spiking, keep going
 
     else{
-        if (i==toCheck[0] || i==toCheck[1] || i==toCheck[2]){
-        //cout << "Voltage = " << i << " " <<  V1[i] << " Time = " << t1[i] << endl;
-        afile << V1[i] << " " << t1[i] << endl;
+
+        if (toCheck[step-1][i]){
+        afile << i << " " << V1[i] << " " << t1[i] << endl;
       }
+
       Vo[i] = V1[i];
       to[i] = t1[i];
 
@@ -229,7 +280,20 @@ for(int j=0; j<100000; j++){
   }
 }
 
-  weightfile << VectCond[wCheckPre][wCheckPost] << " " << timer << endl;
+for(int k=0; k<numOfNodes; k++){
+  if (toCheck[step-1][k]){
+    if (step==1 && VectCondCopy[0][k]){
+      weightfile << 0 << " " <<  k << " " << VectCond[0][k]<<endl;
+      continue;
+    }
+    for (int l=0; l<numOfNodes; l++){
+
+      if(VectCondCopy[l][k] && toCheck[step-2][l]){
+        weightfile << l << " " <<  k << " " << VectCond[l][k]<<endl;
+        }
+      }
+    }
+}
 
 }
   // for(int i=0; i<numOfNodes; i++){
