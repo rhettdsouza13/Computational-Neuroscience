@@ -6,7 +6,7 @@
 #include<math.h>
 
 using namespace std;
-#define ITERS 100000
+#define ITERS 50000
 
 
 class Neuron{
@@ -40,16 +40,16 @@ double weightUpdate(double t1, double t2, float currentWeight){
     diff = t2-t1;
 
     if (diff>0){
-        return (10*exp(-diff)/0.5)/currentWeight;
+        return (10*exp(-diff)/100)/(currentWeight);
     }
     else if (diff<0){
-        return -(10*exp(diff)/0.5)/currentWeight;
+        return -(10*exp(diff)/100)/(currentWeight);
     }
     else{return 0;}
 }
 
 int main(){
-
+  float update=0;
   int step = 0;
   cout<<"Enter Step -> ";
   cin>>step;
@@ -61,6 +61,8 @@ int main(){
   fstream weightfile;
   weightfile.open("weightdist.txt", ios::out | ios::in);
 
+  fstream spikefile;
+  spikefile.open("spikedist.txt", ios::out | ios::in);
 
   fstream networkfile;
   networkfile.open("network.txt",  ios::out | ios::in);
@@ -70,9 +72,6 @@ int main(){
 
   networkfile >> numOfNodes;
   cout<<numOfNodes<<endl;
-
-
-
 
 
 
@@ -193,17 +192,20 @@ for(int j=0; j<ITERS; j++){
     m[i] = setNeuron[i].calculateSlope(Vo[i]);
   }
   afile << 0 << " " << V1[0] << " " << t1[0] << endl;
+  timer+=0.001;
   for(int i=0; i<numOfNodes; i++){
 
     //stepping voltage and time
     V1[i] = Vo[i] + m[i]*0.001;
     t1[i] = to[i] + 0.001;
-    timer+=0.001;
+
 
     //checking for threshold voltage
 
     if (V1[i]>=setNeuron[i].Ethresh){
       V1[i] = setNeuron[i].Espike;
+
+      spikefile << i << " " << t1[i] << endl;
 
       for (int k = 0; k<numOfNodes; k++){
         if(VectCond[i][k]){
@@ -251,34 +253,36 @@ for(int j=0; j<ITERS; j++){
 
 
     }
-    if (!(j%5)){
-    for(int pre=0; pre<numOfNodes; pre++){
-      for(int post=0; post<numOfNodes; post++){
-        if(VectCond[pre][post]>0){
-        for(int precount=0, postcount=0; precount<SpikeTimes[pre][post][0].size() && postcount<SpikeTimes[pre][post][1].size(); precount++, postcount++){
-          //cout<<SpikeTimes[pre][post][1][postcount]<< " "<< SpikeTimes[pre][post][0][precount]<<endl;
-          // if (weightUpdate(SpikeTimes[pre][post][1][postcount], SpikeTimes[pre][post][0][precount], VectCond[pre][post])){
-          //     cout<<pre << " "<< post << " "<< weightUpdate(SpikeTimes[pre][post][1][postcount], SpikeTimes[pre][post][0][precount], VectCond[pre][post])<< endl;
-          //   }
+    if (!(j%100)){
+      for(int pre=0; pre<numOfNodes; pre++){
+        for(int post=0; post<numOfNodes; post++){
+          update=0;
+          if(VectCond[pre][post]>0){
 
+          for(int postcount=0; postcount<SpikeTimes[pre][post][1].size(); postcount++){
 
-          VectCond[pre][post]+=weightUpdate(SpikeTimes[pre][post][0][precount], SpikeTimes[pre][post][1][postcount], VectCond[pre][post]);
+            for(int precount=0; precount<SpikeTimes[pre][post][0].size(); precount++){
+              update+=weightUpdate(SpikeTimes[pre][post][0][precount], SpikeTimes[pre][post][1][postcount], VectCond[pre][post]);
+              }
+            }
 
-          SpikeTimes[pre][post][1].erase(SpikeTimes[pre][post][1].begin());
-          SpikeTimes[pre][post][0].erase(SpikeTimes[pre][post][0].begin());
+            VectCond[pre][post]+=update;
 
-          //cout<<VectCond[pre][post]<<endl;
-          if (VectCond[pre][post]<=0){
-            VectCond[pre][post]=0;
-          }
-          if(VectCond[pre][post]>100){
-            VectCond[pre][post]=100;
+            // SpikeTimes[pre][post][1].erase(SpikeTimes[pre][post][1].begin());
+            // SpikeTimes[pre][post][0].erase(SpikeTimes[pre][post][0].begin());
+
+            //cout<<VectCond[pre][post]<<endl;
+            if (VectCond[pre][post]<=0){
+              VectCond[pre][post]=0;
+            }
+            // if(VectCond[pre][post]>100){
+            //   VectCond[pre][post]=100;
+            //       }
+
+              }
+            }
           }
         }
-      }
-    }
-  }
-}
 
 for(int k=0; k<numOfNodes; k++){
   if (toCheck[step-1][k]){
