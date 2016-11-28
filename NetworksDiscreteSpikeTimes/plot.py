@@ -5,16 +5,28 @@ second=[]
 third=[]
 data = open("VxT.txt", "r+")
 weightData = open("weightdist.txt", "r+")
+spikedata = open("spikedist.txt", "r+")
 
 listOfWeightData = weightData.readlines()
 listOfData = data.readlines()
+listOfSpikeData = spikedata.readlines()
 
 numberToAnalyze=(len(listOfData)-1)/(int(listOfData[0]))
-
+numOfSyn =(len(listOfWeightData))/(int(listOfData[0]))
 
 
 dataTuples=[[0,[],[]] for i in xrange(numberToAnalyze)]
-dataWeightTuples=[[0,0,[],[]] for i in xrange(numberToAnalyze-1)]
+dataWeightTuples=[[0,0,[],[]] for i in xrange(numOfSyn)]
+
+dataSpikeTuples = [[],[]]
+counter=0
+
+for x in listOfSpikeData:
+    if len(x.split())<2:
+        continue
+    dataSpikeTuples[0].append(x.split()[1])
+    dataSpikeTuples[1].append(x.split()[0])
+
 
 i=1
 while (i<len(listOfData)):
@@ -26,13 +38,15 @@ while (i<len(listOfData)):
 
 k=0
 
+
 while (k<len(listOfWeightData)):
-    for j in xrange(numberToAnalyze-1):
-        dataWeightTuples[j][0] = listOfWeightData[k+j].split()[0]
-        dataWeightTuples[j][1] = listOfWeightData[k+j].split()[1]
-        dataWeightTuples[j][2].append(listOfWeightData[k+j].split()[3])
-        dataWeightTuples[j][3].append(listOfWeightData[k+j].split()[2])
-    k+=(numberToAnalyze-1)
+    for l in xrange(numOfSyn):
+        dataWeightTuples[l][0] = listOfWeightData[k+l].split()[0]
+        dataWeightTuples[l][1] = listOfWeightData[k+l].split()[1]
+        dataWeightTuples[l][2].append(listOfWeightData[k+l].split()[3])
+        dataWeightTuples[l][3].append(listOfWeightData[k+l].split()[2])
+
+    k+=numOfSyn
 
 legendHandles=[]
 
@@ -52,21 +66,12 @@ for lines in dataWeightTuples:
     legendWeightHandles.append(line)
 pl.legend(handles = legendWeightHandles)
 
-# pl.figure(2)
-# line1, = pl.plot(x1data,y1data, label = "First")
-# pl.legend(handles = [line1])
-#
-# pl.figure(3)
-# line2, = pl.plot(x2data,y2data, label= "Second")
-# pl.legend(handles = [line2])
-#
-# pl.figure(4)
-# line3, = pl.plot(x3data,y3data, label = "Third")
-# pl.legend(handles = [line3])
 
-# pl.figure(5).canvas.set_window_title("Weight_Distribution")
-# line4, = pl.plot(wX,wY, label = "WeightsCurve")
-# pl.legend(handles = [line4])
+pl.figure(3).canvas.set_window_title("Spike Distribution")
+pl.scatter(dataSpikeTuples[0],dataSpikeTuples[1])
+
 
 pl.show()
 data.close()
+spikedata.close()
+weightData.close()

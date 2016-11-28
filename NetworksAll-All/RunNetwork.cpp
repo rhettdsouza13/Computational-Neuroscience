@@ -192,7 +192,7 @@ for(int j=0; j<ITERS; j++){
     m[i] = setNeuron[i].calculateSlope(Vo[i]);
   }
   afile << 0 << " " << V1[0] << " " << t1[0] << endl;
-  timer+=0.001;
+  timer+=0.0001;
   for(int i=0; i<numOfNodes; i++){
 
     //stepping voltage and time
@@ -273,10 +273,10 @@ for(int j=0; j<ITERS; j++){
 
             VectCond[pre][post]+=update;
 
-            if(SpikeTimes[pre][post][1].size()>1 && SpikeTimes[pre][post][0].size()>1){
-              SpikeTimes[pre][post][1].erase(SpikeTimes[pre][post][1].begin(), SpikeTimes[pre][post][1].begin() + (SpikeTimes[pre][post][1].size()*0.5));
-              SpikeTimes[pre][post][0].erase(SpikeTimes[pre][post][0].begin(), SpikeTimes[pre][post][0].begin() + (SpikeTimes[pre][post][0].size()*0.5));
-            }
+            // if(SpikeTimes[pre][post][1].size()>1 && SpikeTimes[pre][post][0].size()>1){
+            //   SpikeTimes[pre][post][1].erase(SpikeTimes[pre][post][1].begin(), SpikeTimes[pre][post][1].begin() + (SpikeTimes[pre][post][1].size()*0.5));
+            //   SpikeTimes[pre][post][0].erase(SpikeTimes[pre][post][0].begin(), SpikeTimes[pre][post][0].begin() + (SpikeTimes[pre][post][0].size()*0.5));
+            // }
             prestart = SpikeTimes[pre][post][0].size();
             poststart = SpikeTimes[pre][post][1].size();
 
