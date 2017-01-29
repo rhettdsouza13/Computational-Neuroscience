@@ -40,12 +40,13 @@ double weightUpdate(double t1, double t2, float currentWeight){
     diff = t2-t1;
 
     if (diff>0){
-        return (10*exp(-diff)/0.5)/currentWeight;
+        return (0.01*exp(-diff)/0.5)/currentWeight;
     }
     else if (diff<0){
-        return -(10*exp(diff)/0.5)/currentWeight;
+        return -(0.01*exp(diff)/0.5)/currentWeight;
     }
     else{return 0;}
+
 }
 
 int main(){
@@ -196,13 +197,13 @@ for(int j=0; j<ITERS; j++){
   for (int i =0; i<numOfNodes; i++){
     m[i] = setNeuron[i].calculateSlope(Vo[i]);
   }
-  timer+=0.0001;
+  timer+=0.00005;
   afile << 0 << " " << V1[0] << " " << t1[0] << endl;
   for(int i=0; i<numOfNodes; i++){
 
     //stepping voltage and time
-    V1[i] = Vo[i] + m[i]*0.0001;
-    t1[i] = to[i] + 0.0001;
+    V1[i] = Vo[i] + m[i]*0.00005;
+    t1[i] = to[i] + 0.00005;
 
 
     //checking for threshold voltage
@@ -258,26 +259,35 @@ for(int j=0; j<ITERS; j++){
 
     }
     //STDP training rule application
-    if (!(j%5)){
+    if (!(j%1)){
     for(int pre=0; pre<numOfNodes; pre++){
       for(int post=0; post<numOfNodes; post++){
         if(VectCond[pre][post]>0){
-        for(int precount=0, postcount=0; precount<SpikeTimes[pre][post][0].size() && postcount<SpikeTimes[pre][post][1].size(); precount++, postcount++){
 
+          if (SpikeTimes[pre][post][0].size()>0 && SpikeTimes[pre][post][1].size()>0){
+            if (*SpikeTimes[pre][post][0].end()==*SpikeTimes[pre][post][1].end() && SpikeTimes[pre][post][0].size()>1){
+              VectCond[pre][post]+=weightUpdate(*(SpikeTimes[pre][post][0].end()-1), *SpikeTimes[pre][post][1].end(), VectCond[pre][post]);
+            }
+            if (*SpikeTimes[pre][post][0].end()==*SpikeTimes[pre][post][1].end() && SpikeTimes[pre][post][1].size()>1){
+              VectCond[pre][post]+=weightUpdate(*SpikeTimes[pre][post][0].end(), *(SpikeTimes[pre][post][1].end()-1), VectCond[pre][post]);
+            }
+            else{
+              VectCond[pre][post]+=weightUpdate(*SpikeTimes[pre][post][0].end(), *SpikeTimes[pre][post][1].end(), VectCond[pre][post]);
+            }
+            if (SpikeTimes[pre][post][0].size()>1){
+              SpikeTimes[pre][post][1].erase(SpikeTimes[pre][post][1].begin(), SpikeTimes[pre][post][1].end()-1);
+            }
+            if(SpikeTimes[pre][post][1].size()>1){
+              SpikeTimes[pre][post][0].erase(SpikeTimes[pre][post][0].begin(), SpikeTimes[pre][post][0].end()-1);
+            }
 
-
-          VectCond[pre][post]+=weightUpdate(SpikeTimes[pre][post][0][precount], SpikeTimes[pre][post][1][postcount], VectCond[pre][post]);
-
-          SpikeTimes[pre][post][1].erase(SpikeTimes[pre][post][1].begin());
-          SpikeTimes[pre][post][0].erase(SpikeTimes[pre][post][0].begin());
-
-          if (VectCond[pre][post]<=0){
-            VectCond[pre][post]=0;
+            if (VectCond[pre][post]<=0){
+              VectCond[pre][post]=0;
+            }
+            if(VectCond[pre][post]>100){
+              VectCond[pre][post]=100;
+            }
           }
-          if(VectCond[pre][post]>100){
-            VectCond[pre][post]=100;
-          }
-        }
       }
     }
   }
