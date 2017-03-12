@@ -52,8 +52,13 @@ double weightUpdate(double t1, double t2, float currentWeight){
 int main(){
 
   int step = 0;
+  int train = 0;
   cout<<"Enter Step -> ";
   cin>>step;
+  cout<<endl;
+
+  cout<<"Do you want to train? ";
+  cin>>train;
   cout<<endl;
 
   std::vector<Neuron> setNeuron;
@@ -79,17 +84,28 @@ int main(){
 
 
 
-
+  srand(time(NULL));
   for (int i=0; i<numOfNodes; i++){
     V1.push_back(0);
     to.push_back(0);
     t1.push_back(0);
     m.push_back(0);
-    setNeuron.push_back(Neuron(0.1,0,0.2,0.3,0.6,0.1,1));
-    Vo.push_back(setNeuron[i].Eleak);
+    setNeuron.push_back(Neuron(1,0,1,0,1,0,1));
+    Vo.push_back(rand()/(float)RAND_MAX);
   }
 
-  setNeuron[0].I = 0.5;
+
+  float upper=1.75;
+  float lower=2;
+  float drange=upper-lower;
+  float av = (upper+lower)/2;
+  float hike = (av/numOfNodes)*0.2;
+
+  for (int i=0; i<numOfNodes; i++){
+
+    setNeuron[i].I = lower + (drange*rand()/(float)RAND_MAX);
+
+  }
   //can try out different neurons with different current values
   //setNeuron[2].I = 0.25;
   //setNeuron[1].I = 0.001;
@@ -197,13 +213,17 @@ for(int j=0; j<ITERS; j++){
   for (int i =0; i<numOfNodes; i++){
     m[i] = setNeuron[i].calculateSlope(Vo[i]);
   }
-  timer+=0.00005;
+  // for(int neur=0; neur<5; neru++)
+  // {
+  //       setNeuron[neur].I = 4 + sin(timer*500);
+  // }
+  timer+=0.0005;
   afile << 0 << " " << V1[0] << " " << t1[0] << endl;
   for(int i=0; i<numOfNodes; i++){
 
     //stepping voltage and time
-    V1[i] = Vo[i] + m[i]*0.00005;
-    t1[i] = to[i] + 0.00005;
+    V1[i] = Vo[i] + m[i]*0.0005;
+    t1[i] = to[i] + 0.0005;
 
 
     //checking for threshold voltage
@@ -224,7 +244,8 @@ for(int j=0; j<ITERS; j++){
       }
 
       for (int k=0; k<numOfNodes; k++){
-          Vo[k]+=(0.01*VectCond[i][k]);
+          Vo[k]+=hike;
+          // Vo[k]+=(0.01*VectCond[i][k]);
       }
 
 
@@ -259,6 +280,7 @@ for(int j=0; j<ITERS; j++){
 
     }
     //STDP training rule application
+    if(train==1){
     if (!(j%1)){
     for(int pre=0; pre<numOfNodes; pre++){
       for(int post=0; post<numOfNodes; post++){
@@ -290,6 +312,7 @@ for(int j=0; j<ITERS; j++){
           }
       }
     }
+  }
   }
 }
 
