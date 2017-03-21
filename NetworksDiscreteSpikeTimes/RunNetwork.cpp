@@ -6,7 +6,7 @@
 #include<math.h>
 
 using namespace std;
-#define ITERS 100000
+#define ITERS 200000
 
 
 class Neuron{
@@ -96,15 +96,17 @@ int main(){
 
 
   float upper=1.75;
-  float lower=2;
+  float lower=1.9;
   float drange=upper-lower;
   float av = (upper+lower)/2;
   float hike = (av/numOfNodes)*0.2;
 
   for (int i=0; i<numOfNodes; i++){
 
-    setNeuron[i].I = lower + (drange*rand()/(float)RAND_MAX);
+    //setNeuron[i].I = lower + (drange*rand()/(float)RAND_MAX);
 
+    setNeuron[i].I = 1.75 + (0.05*(rand()%5));
+    cout<< i << " " << setNeuron[i].I<<endl;
   }
   //can try out different neurons with different current values
   //setNeuron[2].I = 0.25;
@@ -213,10 +215,25 @@ for(int j=0; j<ITERS; j++){
   for (int i =0; i<numOfNodes; i++){
     m[i] = setNeuron[i].calculateSlope(Vo[i]);
   }
-  // for(int neur=0; neur<5; neru++)
-  // {
-  //       setNeuron[neur].I = 4 + sin(timer*500);
-  // }
+  if(j>=0){
+    for(int neur=0; neur<10; neur++)
+    {
+          setNeuron[neur].I = 2 + 2*sin(timer*150);
+    }
+  }
+  if(j==((ITERS/4))){
+    cout<<"Making Changes"<<endl;
+    for(int neur=0; neur<numOfNodes; neur++){
+      for(int neurp=0; neurp<numOfNodes; neurp++){
+        if((rand()%100)>80 && neur>9 && neurp>9){
+            VectCond[neur][neurp] = 0;
+            VectCond[neurp][neur] = 0;
+        }
+      }
+
+    }
+    cout<<"Changes Made, Continuing...."<<endl;
+  }
   timer+=0.0005;
   afile << 0 << " " << V1[0] << " " << t1[0] << endl;
   for(int i=0; i<numOfNodes; i++){
@@ -244,7 +261,9 @@ for(int j=0; j<ITERS; j++){
       }
 
       for (int k=0; k<numOfNodes; k++){
+        if (VectCond[i][k]){
           Vo[k]+=hike;
+        }
           // Vo[k]+=(0.01*VectCond[i][k]);
       }
 
