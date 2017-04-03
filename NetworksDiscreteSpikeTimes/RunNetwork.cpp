@@ -6,7 +6,7 @@
 #include<math.h>
 
 using namespace std;
-#define ITERS 200000
+#define ITERS 100000
 
 
 class Neuron{
@@ -95,8 +95,8 @@ int main(){
   }
 
 
-  float upper=1.75;
-  float lower=1.9;
+  float upper=1.9;
+  float lower=1.75;
   float drange=upper-lower;
   float av = (upper+lower)/2;
   float hike = (av/numOfNodes)*0.2;
@@ -221,11 +221,11 @@ for(int j=0; j<ITERS; j++){
           setNeuron[neur].I = 2 + 2*sin(timer*150);
     }
   }
-  if(j==((ITERS/4))){
+  if(j==((ITERS/2))){
     cout<<"Making Changes"<<endl;
     for(int neur=0; neur<numOfNodes; neur++){
       for(int neurp=0; neurp<numOfNodes; neurp++){
-        if((rand()%100)>80 && neur>9 && neurp>9){
+        if((rand()%100)>90 && neur>9 && neurp>9){
             VectCond[neur][neurp] = 0;
             VectCond[neurp][neur] = 0;
         }
