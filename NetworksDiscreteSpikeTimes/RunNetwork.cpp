@@ -6,7 +6,7 @@
 #include<math.h>
 
 using namespace std;
-#define ITERS 100000
+#define ITERS 200000
 
 
 class Neuron{

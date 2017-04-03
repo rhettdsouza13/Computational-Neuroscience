@@ -1,5 +1,7 @@
 import matplotlib.pyplot as pl
 import numpy as np
+
+binSize = 0.2
 first=[]
 second=[]
 third=[]
@@ -19,6 +21,7 @@ dataTuples=[[0,[],[]] for i in xrange(numberToAnalyze)]
 dataWeightTuples=[[0,0,[],[]] for i in xrange(numOfSyn)]
 
 dataSpikeTuples = [[],[]]
+dataCount = [[],[]]
 counter=0
 
 for x in listOfSpikeData:
@@ -26,6 +29,21 @@ for x in listOfSpikeData:
         continue
     dataSpikeTuples[0].append(x.split()[1])
     dataSpikeTuples[1].append(x.split()[0])
+
+
+per=binSize
+binNum=0
+while per-binSize < float(dataSpikeTuples[0][len(dataSpikeTuples[0])-1]):
+    dataCount[0].append(0)
+    dataCount[1].append(binNum)
+
+    for t in dataSpikeTuples[0]:
+        if float(t)>per or float(t)<per-binSize:
+            continue
+        else:
+            dataCount[0][binNum]+=1
+    per+=binSize
+    binNum+=1
 
 
 i=1
@@ -69,6 +87,9 @@ pl.legend(handles = legendWeightHandles)
 
 pl.figure(3).canvas.set_window_title("Spike Distribution")
 pl.scatter(dataSpikeTuples[0],dataSpikeTuples[1])
+
+pl.figure(4).canvas.set_window_title("Spike Count Distribution")
+pl.plot(dataCount[1],dataCount[0])
 
 
 pl.show()
