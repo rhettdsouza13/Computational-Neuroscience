@@ -6,7 +6,7 @@
 #include<math.h>
 
 using namespace std;
-#define ITERS 200000
+#define ITERS 400000
 
 
 class Neuron{
@@ -215,17 +215,17 @@ for(int j=0; j<ITERS; j++){
   for (int i =0; i<numOfNodes; i++){
     m[i] = setNeuron[i].calculateSlope(Vo[i]);
   }
-  if(j>=0){
-    for(int neur=0; neur<10; neur++)
-    {
-          setNeuron[neur].I = 2 + 2*sin(timer*150);
-    }
-  }
-  if(j==((ITERS/2))){
+  // if(j>=0){
+  //   for(int neur=0; neur<10; neur++)
+  //   {
+  //         setNeuron[neur].I = 2 + sin(timer*100);
+  //   }
+  // }
+  if(j==((ITERS/4))){
     cout<<"Making Changes"<<endl;
     for(int neur=0; neur<numOfNodes; neur++){
       for(int neurp=0; neurp<numOfNodes; neurp++){
-        if((rand()%100)>90 && neur>9 && neurp>9){
+        if((rand()%100)>80 && neur>9 && neurp>9){
             VectCond[neur][neurp] = 0;
             VectCond[neurp][neur] = 0;
         }
