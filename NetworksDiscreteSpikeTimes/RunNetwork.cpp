@@ -6,7 +6,7 @@
 #include<math.h>
 
 using namespace std;
-#define ITERS 400000
+#define ITERS 100000
 
 
 class Neuron{
@@ -49,17 +49,19 @@ double weightUpdate(double t1, double t2, float currentWeight){
 
 }
 
-int main(){
+int main(int argc, char *argv[]){
 
-  int step = 0;
+  int prob = atoi(argv[1]);
+  int step = 1;
   int train = 0;
-  cout<<"Enter Step -> ";
-  cin>>step;
-  cout<<endl;
 
-  cout<<"Do you want to train? ";
-  cin>>train;
-  cout<<endl;
+  // cout<<"Enter Step -> ";
+  // cin>>step;
+  // cout<<endl;
+  //
+  // cout<<"Do you want to train? ";
+  // cin>>train;
+  // cout<<endl;
 
   std::vector<Neuron> setNeuron;
   std::vector<float> Vo,V1,to,t1,m;
@@ -221,19 +223,19 @@ for(int j=0; j<ITERS; j++){
   //         setNeuron[neur].I = 2 + sin(timer*100);
   //   }
   // }
-  if(j==((ITERS/4))){
-    cout<<"Making Changes"<<endl;
-    for(int neur=0; neur<numOfNodes; neur++){
-      for(int neurp=0; neurp<numOfNodes; neurp++){
-        if((rand()%100)>80 && neur>9 && neurp>9){
-            VectCond[neur][neurp] = 0;
-            VectCond[neurp][neur] = 0;
-        }
-      }
-
-    }
-    cout<<"Changes Made, Continuing...."<<endl;
-  }
+  // if(j==((ITERS/4))){
+  //   cout<<"Making Changes"<<endl;
+  //   for(int neur=0; neur<numOfNodes; neur++){
+  //     for(int neurp=0; neurp<numOfNodes; neurp++){
+  //       if((rand()%100)>prob && neur>9 && neurp>9){
+  //           VectCond[neur][neurp] = 0;
+  //           VectCond[neurp][neur] = 0;
+  //       }
+  //     }
+  //
+  //   }
+  //   cout<<"Changes Made, Continuing...."<<endl;
+  // }
   timer+=0.0005;
   afile << 0 << " " << V1[0] << " " << t1[0] << endl;
   for(int i=0; i<numOfNodes; i++){

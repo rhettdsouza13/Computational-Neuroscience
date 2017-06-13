@@ -4,6 +4,5 @@ truncate -s 0 spikedist.txt
 
 g++ RunNetwork.cpp -o fire_away
 
-./fire_away
-python plot.py
-truncate -s 0 filename
+./fire_away 90
+python plot.py 90
